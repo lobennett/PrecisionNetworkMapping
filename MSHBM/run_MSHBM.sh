@@ -2,7 +2,7 @@
 sub_list=$1
 outputdir=$2
 codedir=$3
-mkdir -p $output_dir/log
+mkdir -p $outputdir/log
 
 # # prepare to train model parameters
 
