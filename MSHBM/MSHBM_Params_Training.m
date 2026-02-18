@@ -9,15 +9,14 @@ addpath(genpath(fullfile([codedir '/MSHBM'])))
 % addpath(genpath(fullfile([codedir '/ncf_tools']))) 
 
 numofnet=str2double(numofnet);
-sub_list_table=readtable(sub_list,'Delimiter',',');
+sub_list_table=readtable(sub_list,'Delimiter',',','ReadVariableNames',false);
 SUB=(table2cell(sub_list_table(:,1)))';
 partition=(table2cell(sub_list_table(:,2)))';
-SUBin=[];
+% construct output folder name from full subject IDs (BIDS-compliant)
+SUBin = strjoin(SUB, '_');
 
 for s=1:length(SUB)
-    
-    temp=SUB{s}(1:3);
-    SUBin=strcat(SUBin,temp);
+
     datadir=partition{s};
     cd(fullfile([datadir SUB{s}]))
     lhdirlist = dir('lh*nat_resid_bpss_fsaverage6_sm*.nii.gz');

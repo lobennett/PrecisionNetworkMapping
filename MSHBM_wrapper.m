@@ -7,16 +7,12 @@ function MSHBM_wrapper(sub_list,output_dir,codedir)
 
 addpath(genpath(fullfile([codedir '/MSHBM'])))
 
-sub_list_table=readtable(sub_list,'Delimiter',',');
+sub_list_table=readtable(sub_list,'Delimiter',',','ReadVariableNames',false);
 SUB=(table2cell(sub_list_table(:,1)))';
 partition=(table2cell(sub_list_table(:,2)))';
 
-% create output folder name
-SUBin=[];
-for i=1:length(SUB)
-    temp=SUB{i}(1:3);
-    SUBin=strcat(SUBin,temp);
-end
+% create output folder name from full subject IDs (BIDS-compliant)
+SUBin = strjoin(SUB, '_');
 mainoutdir=[output_dir '/Params_' SUBin];
 mkdir(mainoutdir);
 copyfile([codedir '/MSHBM/MSHBM_folder_structure_template'],[mainoutdir '/Params_training']);

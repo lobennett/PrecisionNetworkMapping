@@ -4,7 +4,7 @@
 #SBATCH -N 1
 #SBATCH -c 1
 #SBATCH -p russpold,normal
-#SBATCH --mem=100GB
+#SBATCH --mem=200GB
 #SBATCH -t 12:00:00
 #SBATCH --job-name MSHBM_Training
 
