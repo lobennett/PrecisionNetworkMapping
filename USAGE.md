@@ -11,7 +11,7 @@ This guide covers how to run the 15-network MSHBM individual parcellation pipeli
    lh*nat_resid_bpss_fsaverage6_sm*.nii.gz
    rh*nat_resid_bpss_fsaverage6_sm*.nii.gz
    ```
-   The `run_vol2fsaverage.py` script produces files in this format automatically.
+   The `prepare_mshbm_inputs.py` script produces files in this format automatically.
 
 3. **Subject list CSV**: A CSV file mapping subjects to their data directories:
    ```csv
@@ -32,10 +32,11 @@ This guide covers how to run the 15-network MSHBM individual parcellation pipeli
 ```bash
 cd /home/users/logben/network_glm
 
-./slurm/vol2fsaverage_batch.sh \
+./slurm/prepare_mshbm_inputs.sh \
     --subjects-file data/subs_validation.txt \
     --glm-dir /oak/stanford/groups/russpold/data/network_grant/discovery_BIDS_20250402/derivatives/network_glm_lev1_surface \
     --fmriprep-dir /oak/stanford/groups/russpold/data/network_grant/discovery_BIDS_20250402/derivatives/fmriprep_24.1.0rc2 \
+    --rest-fmriprep-dir /oak/stanford/groups/russpold/data/network_grant/discovery_BIDS_20250402/derivatives/fmriprep_rest_freesurfer_8.1.0_24.1.0rc2 \
     --residuals-space surface \
     --verbose
 ```
@@ -146,12 +147,13 @@ cat /scratch/users/logben/mshbm_output/log/MSHBM_*.out
        --space surface --residuals
    ```
 
-2. Project residuals to fsaverage6:
+2. Prepare fsaverage6 surface inputs:
    ```bash
-   ./slurm/vol2fsaverage_batch.sh \
+   ./slurm/prepare_mshbm_inputs.sh \
        --subjects-file data/new_subjects.txt \
        --glm-dir /path/to/lev1_surface \
        --fmriprep-dir /path/to/fmriprep \
+       --rest-fmriprep-dir /path/to/rest_fmriprep \
        --residuals-space surface
    ```
 
@@ -197,7 +199,7 @@ git clone https://github.com/Washington-University/cifti-matlab \
 
 ### No surface input files found
 
-Check that `run_vol2fsaverage.py` produced files matching the expected glob pattern:
+Check that `prepare_mshbm_inputs.py` produced files matching the expected glob pattern:
 ```bash
 ls /scratch/users/logben/surface_inputs/sub-s03/lh*nat_resid_bpss_fsaverage6_sm*.nii.gz
 ```
