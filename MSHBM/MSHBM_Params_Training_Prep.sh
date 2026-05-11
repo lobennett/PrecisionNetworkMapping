@@ -4,7 +4,7 @@
 #SBATCH -N 1
 #SBATCH -p bigmem
 #SBATCH --job-name MSHBM_Prep
-#SBATCH --mem=200GB
+#SBATCH --mem=256GB
 #SBATCH -t 12:00:00
 
 # Sherlock modules
