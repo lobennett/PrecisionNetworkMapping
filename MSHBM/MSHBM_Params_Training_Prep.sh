@@ -2,9 +2,9 @@
 #
 #SBATCH -n 1
 #SBATCH -N 1
-#SBATCH -p russpold,normal
+#SBATCH -p bigmem
 #SBATCH --job-name MSHBM_Prep
-#SBATCH --mem=100GB
+#SBATCH --mem=200GB
 #SBATCH -t 12:00:00
 
 # Sherlock modules
