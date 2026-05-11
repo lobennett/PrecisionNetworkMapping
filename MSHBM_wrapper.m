@@ -12,7 +12,13 @@ SUB=(table2cell(sub_list_table(:,1)))';
 partition=(table2cell(sub_list_table(:,2)))';
 
 % create output folder name from full subject IDs (BIDS-compliant)
+% For small cohorts, use joined IDs (preserves the original behavior).
+% For large cohorts, the joined name would exceed the 255-byte filesystem
+% limit, so fall back to a count-based name.
 SUBin = strjoin(SUB, '_');
+if length(SUBin) > 200
+    SUBin = ['cohort_N' num2str(length(SUB))];
+end
 mainoutdir=[output_dir '/Params_' SUBin];
 mkdir(mainoutdir);
 copyfile([codedir '/MSHBM/MSHBM_folder_structure_template'],[mainoutdir '/Params_training']);

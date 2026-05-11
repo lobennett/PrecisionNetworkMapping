@@ -12,8 +12,12 @@ numofnet=str2double(numofnet);
 sub_list_table=readtable(sub_list,'Delimiter',',','ReadVariableNames',false);
 SUB=(table2cell(sub_list_table(:,1)))';
 partition=(table2cell(sub_list_table(:,2)))';
-% construct output folder name from full subject IDs (BIDS-compliant)
+% construct output folder name from full subject IDs (BIDS-compliant).
+% For large cohorts, fall back to count-based name to avoid 255-byte path limit.
 SUBin = strjoin(SUB, '_');
+if length(SUBin) > 200
+    SUBin = ['cohort_N' num2str(length(SUB))];
+end
 
 for s=1:length(SUB)
 
