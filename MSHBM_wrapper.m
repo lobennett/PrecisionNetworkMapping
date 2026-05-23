@@ -75,12 +75,12 @@ for j=1:length(SUB)
     for k = 1:numofsess(j)
         eval(['pathname_lh1 = sub' num2str(j) '_lhdirlist(k).folder']);
         eval(['pathname_lh2 = sub' num2str(j) '_lhdirlist(k).name']);
-        indstr=eval(['sub' num2str(j) '_lhdirlist(k).name' '(13:14)']);
-        if indstr(2)=='_'
-            ind=str2double(indstr(1));
-        else
-            ind=str2double(indstr(1:2));
-        end
+        % Parse session number from filename via regex so it works for any
+        % subject-index width (the previous hardcoded chars(13:14) window
+        % broke as soon as the cohort had >9 subjects, because 'sub10' is
+        % one char longer than 'sub1' and shifts the session field).
+        sess_tok = regexp(pathname_lh2, '_sess(\d+)_', 'tokens');
+        ind = str2double(sess_tok{1}{1});
         str_lh{ind} = [pathname_lh1 '/' pathname_lh2];
         eval(['pathname_rh1 = sub' num2str(j) '_rhdirlist(k).folder']);
         eval(['pathname_rh2 = sub' num2str(j) '_rhdirlist(k).name']);
@@ -103,14 +103,13 @@ for i=1:length(str_lh_sub1)
         eval(['temp_rh_' num2str(s) '= str_rh_sub' num2str(s) '{i}']);
     end
     eval(['tpname=temp_lh_' num2str(indmaxsess)]);
-    sessName=tpname(length(tpname)-51:length(tpname)-49);
-    if sessName(1)=='s'
-        filetext_lh = fopen([profile_outdir 'lh_sess' sessName(2) '.txt'],'w');
-        filetext_rh = fopen([profile_outdir 'rh_sess' sessName(2) '.txt'],'w');
-    else
-        filetext_lh = fopen([profile_outdir 'lh_sess' sessName(1:2) '.txt'],'w');
-        filetext_rh = fopen([profile_outdir 'rh_sess' sessName(1:2) '.txt'],'w');
-    end
+    % Parse session number from path via regex so it works for any
+    % subject- or session-index width (the previous length(tpname)-51 char
+    % window broke for >9 subjects and dropped a digit for >9 sessions).
+    sess_tok = regexp(tpname, '_sess(\d+)_', 'tokens');
+    sess_num = sess_tok{1}{1};
+    filetext_lh = fopen([profile_outdir 'lh_sess' sess_num '.txt'],'w');
+    filetext_rh = fopen([profile_outdir 'rh_sess' sess_num '.txt'],'w');
     printstr_lh = [];
     printstr_rh = [];
     for s=1:length(SUB)
