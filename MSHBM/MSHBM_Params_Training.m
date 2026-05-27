@@ -52,7 +52,12 @@ save(GroupFileDir2,'lh_labels','rh_labels','clustered');
 project_dir=[mainoutdir '/Params_training_' num2str(numofnet) '/estimate_group_priors/'];
 maxsess=max(numofsess);
 numofsub=length(SUB);
-Params = CBIG_MSHBM_estimate_group_priors(project_dir,'fsaverage6',num2str(numofsub),num2str(maxsess),num2str(numofnet),'max_iter','5');
+% CBIG default is max_iter=50, conv_th=1e-5 (production setting).
+% The 'max_iter','5' that lived here was copied verbatim from CBIG's toy
+% example (2 subjects, 2 sessions, 17 networks) and capped training at
+% 10% of the iterations needed for the EM posterior to converge, leaving
+% MSHBM with amoeba-shaped, territorially-incoherent network assignments.
+Params = CBIG_MSHBM_estimate_group_priors(project_dir,'fsaverage6',num2str(numofsub),num2str(maxsess),num2str(numofnet),'max_iter','50','conv_th','1e-5');
 CBIG_IndCBM_extract_MSHBM_result_SUB(project_dir,SUB);
 label2cifti(fullfile([project_dir '/ind_parcellation/']),codedir);
 
