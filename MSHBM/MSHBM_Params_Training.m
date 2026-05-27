@@ -23,8 +23,13 @@ for s=1:length(SUB)
 
     datadir=partition{s};
     cd(fullfile([datadir SUB{s}]))
-    lhdirlist = dir('lh*nat_resid_bpss_fsaverage6_sm*.nii.gz');
-    rhdirlist = dir('rh*nat_resid_bpss_fsaverage6_sm*.nii.gz');
+    % Accept either the original prep-mshbm naming
+    %   lh_ses-NN_task-T_run-1_nat_resid_bpss_fsaverage6_sm0.nii.gz
+    % or the XCP-D-based naming
+    %   lh_ses-NN_task-T_xcpd_fsaverage6_sm2.nii.gz
+    % by matching the common fsaverage6_sm* suffix only.
+    lhdirlist = dir('lh*fsaverage6_sm*.nii.gz');
+    rhdirlist = dir('rh*fsaverage6_sm*.nii.gz');
     numofsess(s)=length(lhdirlist);
     
 end
