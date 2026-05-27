@@ -2,9 +2,9 @@
 #
 #SBATCH -n 1
 #SBATCH -N 1
-#SBATCH -c 1
+#SBATCH -c 8
 #SBATCH -p bigmem
-#SBATCH --mem=1000GB
+#SBATCH --mem=512G
 #SBATCH -t 12:00:00
 #SBATCH --job-name MSHBM_Training
 
