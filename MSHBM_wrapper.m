@@ -36,19 +36,86 @@ for s=1:length(SUB)
     % by matching the common fsaverage6_sm* suffix only.
     lhdirlist = dir('lh*fsaverage6_sm*.nii.gz');
     rhdirlist = dir('rh*fsaverage6_sm*.nii.gz');
-    
-    numofsess(s)=length(lhdirlist);
-    for i =1:length(lhdirlist)
-        dirname = [lhdirlist(i).folder '/' lhdirlist(i).name];
-        filetext = fopen([outdir 'lh_sub' num2str(s) '_sess' num2str(i) '.txt'],'w');
-        fprintf(filetext,dirname);
-        fclose(filetext);
-    end
-    for i =1:length(rhdirlist)
-        dirname = [rhdirlist(i).folder '/' rhdirlist(i).name];
-        filetext = fopen([outdir 'rh_sub' num2str(s) '_sess' num2str(i) '.txt'],'w');
-        fprintf(filetext,dirname);
-        fclose(filetext);
+
+    % Two file-list modes, selected by env var MSHBM_GROUP_BY_SESSION:
+    %   unset/'0' (default): one MSHBM 'session' = one scan file. Original
+    %       per-file behavior; the per-cell binary profile is built from a
+    %       single short run.
+    %   '1': one MSHBM 'session' = one BIDS recording session (ses-NN), with
+    %       all task + rest runs from that session listed together so that
+    %       CBIG_ComputeCorrelationProfile averages their correlation
+    %       matrices ACROSS runs BEFORE the top-10% binarization. Matches the
+    %       Kong 2019 / Du 2024 convention of session = recording day with
+    %       multiple runs, and reduces per-profile noise substantially.
+    if strcmp(getenv('MSHBM_GROUP_BY_SESSION'), '1')
+        lh_sess_map = containers.Map('KeyType','char','ValueType','any');
+        lh_sess_order = {};
+        for i = 1:length(lhdirlist)
+            name = lhdirlist(i).name;
+            sess_tok = regexp(name, '_ses-([A-Za-z0-9]+)_', 'tokens');
+            sid = sess_tok{1}{1};
+            if ~lh_sess_map.isKey(sid)
+                lh_sess_order{end+1} = sid;
+                lh_sess_map(sid) = {};
+            end
+            paths = lh_sess_map(sid);
+            paths{end+1} = [lhdirlist(i).folder '/' name];
+            lh_sess_map(sid) = paths;
+        end
+        lh_sess_order = sort(lh_sess_order);
+        numofsess(s) = length(lh_sess_order);
+
+        for i = 1:numofsess(s)
+            sid = lh_sess_order{i};
+            paths = lh_sess_map(sid);
+            filetext = fopen([outdir 'lh_sub' num2str(s) '_sess' num2str(i) '.txt'],'w');
+            for k = 1:length(paths)
+                if k > 1
+                    fprintf(filetext, '\n');
+                end
+                fprintf(filetext, paths{k});
+            end
+            fclose(filetext);
+        end
+
+        rh_sess_map = containers.Map('KeyType','char','ValueType','any');
+        for i = 1:length(rhdirlist)
+            name = rhdirlist(i).name;
+            sess_tok = regexp(name, '_ses-([A-Za-z0-9]+)_', 'tokens');
+            sid = sess_tok{1}{1};
+            if ~rh_sess_map.isKey(sid)
+                rh_sess_map(sid) = {};
+            end
+            paths = rh_sess_map(sid);
+            paths{end+1} = [rhdirlist(i).folder '/' name];
+            rh_sess_map(sid) = paths;
+        end
+        for i = 1:numofsess(s)
+            sid = lh_sess_order{i};
+            paths = rh_sess_map(sid);
+            filetext = fopen([outdir 'rh_sub' num2str(s) '_sess' num2str(i) '.txt'],'w');
+            for k = 1:length(paths)
+                if k > 1
+                    fprintf(filetext, '\n');
+                end
+                fprintf(filetext, paths{k});
+            end
+            fclose(filetext);
+        end
+    else
+        numofsess(s)=length(lhdirlist);
+        for i =1:length(lhdirlist)
+            dirname = [lhdirlist(i).folder '/' lhdirlist(i).name];
+            filetext = fopen([outdir 'lh_sub' num2str(s) '_sess' num2str(i) '.txt'],'w');
+            fprintf(filetext,dirname);
+            fclose(filetext);
+        end
+        for i =1:length(rhdirlist)
+            dirname = [rhdirlist(i).folder '/' rhdirlist(i).name];
+            filetext = fopen([outdir 'rh_sub' num2str(s) '_sess' num2str(i) '.txt'],'w');
+            fprintf(filetext,dirname);
+            fclose(filetext);
+        end
     end
     
 end

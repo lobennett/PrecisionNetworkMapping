@@ -30,7 +30,21 @@ for s=1:length(SUB)
     % by matching the common fsaverage6_sm* suffix only.
     lhdirlist = dir('lh*fsaverage6_sm*.nii.gz');
     rhdirlist = dir('rh*fsaverage6_sm*.nii.gz');
-    numofsess(s)=length(lhdirlist);
+    % If MSHBM_wrapper grouped files by BIDS recording session
+    % (MSHBM_GROUP_BY_SESSION=1), the # of MSHBM sessions equals the # of
+    % unique ses-NN tags, not the # of scan files. Mirror that counting
+    % logic here so num_sess passed to CBIG_MSHBM_estimate_group_priors
+    % matches the actual profile_list/training_set/lh_sess?.txt count.
+    if strcmp(getenv('MSHBM_GROUP_BY_SESSION'), '1')
+        sess_ids = {};
+        for i = 1:length(lhdirlist)
+            sess_tok = regexp(lhdirlist(i).name, '_ses-([A-Za-z0-9]+)_', 'tokens');
+            sess_ids{end+1} = sess_tok{1}{1};
+        end
+        numofsess(s) = length(unique(sess_ids));
+    else
+        numofsess(s)=length(lhdirlist);
+    end
     
 end
 
