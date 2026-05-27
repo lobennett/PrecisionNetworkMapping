@@ -5,7 +5,7 @@
 #SBATCH -c 8
 #SBATCH -p bigmem
 #SBATCH --mem=512G
-#SBATCH -t 12:00:00
+#SBATCH -t 48:00:00
 #SBATCH --job-name MSHBM_Training
 
 # Sherlock modules
