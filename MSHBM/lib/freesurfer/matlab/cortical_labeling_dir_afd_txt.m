@@ -1,1 +1,0 @@
-/share/software/user/open/freesurfer/8.1.0/matlab/cortical_labeling_dir_afd_txt.m

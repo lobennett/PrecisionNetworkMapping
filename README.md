@@ -4,6 +4,26 @@ This pipeline is designed to estimate individual-specific brain networks using a
 # Workflow
 The pipeline works with functional MRI data on the fsaverage6 cortical surface space (NIFTI format). Please contact us if you encounter any bugs. Note that this pipeline skips the group prior estimation step and directly uses a pre-trained 15-network group prior (DU15NET). The code for external packages (MS-HBM) is NOT included here, and must be downloaded separately from [Thomas Yeo's Computational Brain Imaging Group](https://github.com/ThomasYeoLab/CBIG). 
 
+# Dependencies / one-time setup (Sherlock)
+The heavy external MATLAB dependencies are **not** vendored in this repo (CBIG is a
+~2.6 GB sparse/partial checkout; `$HOME` on Sherlock is only 15 GB). Run the bootstrap
+once to install them under `$GROUP_HOME/sw`:
+
+```bash
+bash setup_dependencies.sh    # clones CBIG (v0.36.2, sparse) + cifti-matlab into $GROUP_HOME/sw
+```
+
+At runtime the pipeline resolves them via environment variables, defaulting to the
+`$GROUP_HOME/sw` locations, so no machine-specific paths are baked into the code:
+
+- `CBIG_CODE_DIR`   (default `$GROUP_HOME/sw/CBIG`) — supplies `CBIG_MSHBM_*`.
+- `CIFTI_MATLAB_DIR` (default `$GROUP_HOME/sw/cifti-matlab`) — cifti read/write.
+- FreeSurfer matlab is taken from `$FREESURFER_HOME/matlab` (set by
+  `module load biology freesurfer/8.1.0` in the SLURM scripts).
+
+Override any of these by exporting them before launching `run_MSHBM.sh`. The `codedir`
+argument still points at **this repo** (pipeline `.m` code + `MSHBM_prior_15.mat`).
+
 Use ./MSHBM/make-input-csv.sh to create sub_list.csv
 
 Use ./MSHBM/run_MSHBM.sh to submit your job if you use a server. You can call the MATLAB functions directly from the MATLAB command window or script if you use local PC.

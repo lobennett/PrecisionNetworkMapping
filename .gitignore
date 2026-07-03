@@ -1,0 +1,7 @@
+# External MATLAB dependencies are NOT vendored in this repo. They are cloned to
+# $GROUP_HOME/sw by setup_dependencies.sh and resolved at runtime via env vars
+# (CBIG_CODE_DIR, CIFTI_MATLAB_DIR) with $GROUP_HOME/sw defaults; FreeSurfer
+# matlab comes from $FREESURFER_HOME/matlab. See README.
+MSHBM/lib/CBIG_CODE_sparse/
+MSHBM/lib/cifti-matlab/
+MSHBM/lib/freesurfer/
