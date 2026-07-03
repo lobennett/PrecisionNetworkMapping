@@ -2,9 +2,9 @@
 #
 #SBATCH -n 1
 #SBATCH -N 1
-#SBATCH -p bigmem
+#SBATCH -p normal
 #SBATCH --job-name MSHBM_Prep
-#SBATCH --mem=256GB
+#SBATCH --mem=64GB
 #SBATCH -t 12:00:00
 
 # Sherlock modules
@@ -17,7 +17,10 @@ sub_list=$1
 outputdir=$2
 codedir=$3
 
-export CBIG_CODE_DIR=$codedir/MSHBM/lib/CBIG_CODE_sparse
+# Heavy external deps live outside the repo (relocated to $GROUP_HOME/sw; see
+# setup_dependencies.sh). Resolve portably via env vars with $GROUP_HOME defaults.
+export CBIG_CODE_DIR="${CBIG_CODE_DIR:-$GROUP_HOME/sw/CBIG}"
+export CIFTI_MATLAB_DIR="${CIFTI_MATLAB_DIR:-$GROUP_HOME/sw/cifti-matlab}"
 
 mkdir -p $outputdir/log
 

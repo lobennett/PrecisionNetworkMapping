@@ -6,7 +6,19 @@ function MSHBM_Params_Training(sub_list,numofnet,output_dir,codedir)
 
 
 addpath(genpath(fullfile([codedir '/MSHBM'])))
-% addpath(genpath(fullfile([codedir '/ncf_tools']))) 
+% addpath(genpath(fullfile([codedir '/ncf_tools'])))
+
+% Heavy external MATLAB deps are relocated out of the repo (see
+% setup_dependencies.sh / README). Resolve them from env vars, defaulting to
+% $GROUP_HOME/sw so a fresh checkout works without machine-hardcoded paths.
+cbig_dir = getenv('CBIG_CODE_DIR');
+if isempty(cbig_dir), cbig_dir = fullfile(getenv('GROUP_HOME'),'sw','CBIG'); end
+addpath(genpath(cbig_dir));
+cifti_dir = getenv('CIFTI_MATLAB_DIR');
+if isempty(cifti_dir), cifti_dir = fullfile(getenv('GROUP_HOME'),'sw','cifti-matlab'); end
+addpath(genpath(cifti_dir));
+fs_home = getenv('FREESURFER_HOME');
+if ~isempty(fs_home), addpath(fullfile(fs_home,'matlab')); end
 
 numofnet=str2double(numofnet);
 sub_list_table=readtable(sub_list,'Delimiter',',','ReadVariableNames',false);
@@ -66,14 +78,18 @@ save(GroupFileDir2,'lh_labels','rh_labels','clustered');
 project_dir=[mainoutdir '/Params_training_' num2str(numofnet) '/estimate_group_priors/'];
 maxsess=max(numofsess);
 numofsub=length(SUB);
-% CBIG default is max_iter=50, conv_th=1e-5 (production setting).
-% The 'max_iter','5' that lived here was copied verbatim from CBIG's toy
-% example (2 subjects, 2 sessions, 17 networks) and capped training at
-% 10% of the iterations needed for the EM posterior to converge, leaving
-% MSHBM with amoeba-shaped, territorially-incoherent network assignments.
-% max_iter=100 is a safety cap; conv_th=1e-5 (CBIG default) is the actual
-% stopping criterion. EM exits early when posterior log-likelihood change
-% drops below conv_th; max_iter only matters if convergence stalls.
+% Stopping rule: CBIG_MSHBM_estimate_group_priors stops the outer (inter-
+% subject) EM loop when |delta_cost/cost| <= conv_th OR iter_inter >= max_iter
+% (see step2_estimate_priors/CBIG_MSHBM_estimate_group_priors.m ~L286-288).
+% conv_th=1e-5 is the REAL stopping criterion; max_iter=100 is only a safety
+% cap for the pathological case where the cost never converges. In practice
+% these runs converge in ~2-4 outer iterations, so the cap does not bind
+% (verified: Params_iteration*.mat counts of 2-3 and "inter interation" log
+% maxima of 2-3 across the sess_grouped and s10 runs).
+% NOTE: the earlier 'max_iter','5' here (copied from CBIG's 2-subject toy
+% example) did NOT truncate training or cause the amoeba-shaped parcels --
+% every completed run converged in <5 outer iterations, so the cap never
+% bound. Keep max_iter=100 as a generous safety margin, not as a quality fix.
 Params = CBIG_MSHBM_estimate_group_priors(project_dir,'fsaverage6',num2str(numofsub),num2str(maxsess),num2str(numofnet),'max_iter','100','conv_th','1e-5');
 CBIG_IndCBM_extract_MSHBM_result_SUB(project_dir,SUB);
 label2cifti(fullfile([project_dir '/ind_parcellation/']),codedir);

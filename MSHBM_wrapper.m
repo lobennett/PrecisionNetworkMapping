@@ -7,6 +7,18 @@ function MSHBM_wrapper(sub_list,output_dir,codedir)
 
 addpath(genpath(fullfile([codedir '/MSHBM'])))
 
+% Heavy external MATLAB deps are relocated out of the repo (see
+% setup_dependencies.sh / README). Resolve them from env vars, defaulting to
+% $GROUP_HOME/sw so a fresh checkout works without machine-hardcoded paths.
+cbig_dir = getenv('CBIG_CODE_DIR');
+if isempty(cbig_dir), cbig_dir = fullfile(getenv('GROUP_HOME'),'sw','CBIG'); end
+addpath(genpath(cbig_dir));
+cifti_dir = getenv('CIFTI_MATLAB_DIR');
+if isempty(cifti_dir), cifti_dir = fullfile(getenv('GROUP_HOME'),'sw','cifti-matlab'); end
+addpath(genpath(cifti_dir));
+fs_home = getenv('FREESURFER_HOME');
+if ~isempty(fs_home), addpath(fullfile(fs_home,'matlab')); end
+
 sub_list_table=readtable(sub_list,'Delimiter',',','ReadVariableNames',false);
 SUB=(table2cell(sub_list_table(:,1)))';
 partition=(table2cell(sub_list_table(:,2)))';
