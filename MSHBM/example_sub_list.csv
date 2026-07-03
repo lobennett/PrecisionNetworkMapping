@@ -1,3 +1,2 @@
-SUBID,partition
-SUBID_1,SUB_1_FOLDER
-SUBID_2,SUB_2_FOLDER
+sub-01,/abs/path/to/mshbm_inputs_dir/
+sub-02,/abs/path/to/mshbm_inputs_dir/
