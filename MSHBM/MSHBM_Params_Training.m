@@ -71,6 +71,8 @@ lh_labels=lh_labels_fs6;
 rh_labels=rh_labels_fs6;
 GroupFileDir1=[mainoutdir '/Params_training_' num2str(numofnet) '/estimate_group_priors/group/group.mat'];
 GroupFileDir2=[mainoutdir '/Params_training_' num2str(numofnet) '/generate_profiles_and_ini_params/group/group.mat'];
+mkdir([mainoutdir '/Params_training_' num2str(numofnet) '/estimate_group_priors/group/']);
+mkdir([mainoutdir '/Params_training_' num2str(numofnet) '/generate_profiles_and_ini_params/group/']);
 save(GroupFileDir1,'lh_labels','rh_labels','clustered');
 save(GroupFileDir2,'lh_labels','rh_labels','clustered');
 

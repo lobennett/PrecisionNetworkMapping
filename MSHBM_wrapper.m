@@ -35,6 +35,7 @@ mainoutdir=[output_dir '/Params_' SUBin];
 mkdir(mainoutdir);
 copyfile([codedir '/MSHBM/MSHBM_folder_structure_template'],[mainoutdir '/Params_training']);
 outdir=[mainoutdir '/Params_training/generate_profiles_and_ini_params/data_list/fMRI_list/'];
+mkdir(outdir);  % template lacks data_list/fMRI_list; create it before fopen
 % create text files that contain the full path of fixation data:
 numofsess = zeros(length(SUB),1);
 for s=1:length(SUB)
@@ -144,6 +145,7 @@ end
 % creat text files with profiles directories
 datadir=[mainoutdir '/Params_training/generate_profiles_and_ini_params/profiles/'];
 profile_outdir=[mainoutdir '/Params_training/generate_individual_parcellations/profile_list/test_set/'];
+mkdir(profile_outdir);  % template lacks this profile_list/test_set dir; create before fopen
 for j=1:length(SUB)
     j
     cd([datadir '/sub' num2str(j) '/'])
